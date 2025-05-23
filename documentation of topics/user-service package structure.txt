@@ -1,0 +1,14 @@
+user-service
+└── src/main/java/com/yourapp/userservice
+    ├── controller
+    │   └── UserController.java
+    ├── dto
+    │   └── UserDTO.java
+    ├── model
+    │   └── User.java
+    ├── repository
+    │   └── UserRepository.java
+    ├── service
+    │   ├── UserService.java
+    │   └── impl/UserServiceImpl.java
+    └── UserServiceApplication.java

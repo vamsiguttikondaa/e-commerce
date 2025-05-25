@@ -15,4 +15,6 @@ public interface ProductService {
     boolean isValid(Long id);
     Product getProductEntityById(Long id);
     void setPrimary(Product product,String url);
+    ProductResponseDTO updateProduct(Long id, ProductRequestDto dto);
+
 }

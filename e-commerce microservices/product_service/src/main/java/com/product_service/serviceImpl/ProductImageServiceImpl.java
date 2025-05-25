@@ -30,22 +30,21 @@ public class ProductImageServiceImpl implements ProductImageService {
 	@Override
 	
 	public ProductImageResponseDTO createImage(ProductImageDTO image, Long productId) {
-		System.out.println(image);
-		System.out.println(productId);
+		
 	    // 1. Check if product is valid
 	    Product product = proService.getProductEntityById(productId); // throws exception if invalid
-	    System.out.println(product.getId());
+	    
 	    // 2. Convert DTO to Entity
 	    ProductImage imageEntity = dtoConverter.convertToProductImage(image);
-	    System.out.println("after being converted to dto "+imageEntity);
+	 
 
 	    // 3. Set the product object
 	    imageEntity.setProduct(product);
-	    System.out.println("after setting thr product "+imageEntity);
+	  
 
 	    // 4. Save image
 	    ProductImage saved = proImgRepo.save(imageEntity);
-	    System.out.println("saved image"+saved);
+	  
 
 	    // 5. If this is primary, update product table
 	    if (saved.isPrimary()) {
@@ -63,14 +62,60 @@ public class ProductImageServiceImpl implements ProductImageService {
 
 	@Override
 	public ProductImageResponseDTO getImage(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		ProductImage image = proImgRepo.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Image not found with ID: " + id));
+
+	    return ProductImageResponseDTO.builder()
+	            .id(image.getId())
+	            .imageUrl(image.getImageUrl())
+	            .isPrimary(image.isPrimary())
+	            .productId(image.getProduct().getId())
+	            .build();
 	}
 
 	@Override
 	public List<ProductImageResponseDTO> getProductImages(Long productId) {
-		// TODO Auto-generated method stub
-		return null;
+		 Product product = proService.getProductEntityById(productId);
+
+		    List<ProductImage> images = proImgRepo.findByProduct(product);
+
+		    return images.stream()
+		            .map(img -> ProductImageResponseDTO.builder()
+		                    .id(img.getId())
+		                    .imageUrl(img.getImageUrl())
+		                    .isPrimary(img.isPrimary())
+		                    .productId(productId)
+		                    .build())
+		            .toList();
+	}
+	@Override
+	public void deleteImage(Long imageId) {
+	    ProductImage image = proImgRepo.findById(imageId)
+	            .orElseThrow(() -> new RuntimeException("Image not found with ID: " + imageId));
+
+	    proImgRepo.delete(image);
+	}
+	@Override
+	public ProductImageResponseDTO updateImage(Long imageId, ProductImageDTO dto) {
+	    ProductImage existing = proImgRepo.findById(imageId)
+	            .orElseThrow(() -> new RuntimeException("Image not found with ID: " + imageId));
+
+	    existing.setImageUrl(dto.getImageUrl());
+	    existing.setPrimary(dto.getIsPrimary());
+
+	    ProductImage updated = proImgRepo.save(existing);
+
+	    // Also update product primaryImageUrl if needed
+	    if (updated.isPrimary()) {
+	        proService.setPrimary(updated.getProduct(), updated.getImageUrl());
+	    }
+
+	    return ProductImageResponseDTO.builder()
+	            .id(updated.getId())
+	            .imageUrl(updated.getImageUrl())
+	            .isPrimary(updated.isPrimary())
+	            .productId(updated.getProduct().getId())
+	            .build();
 	}
 
 }

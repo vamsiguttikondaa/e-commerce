@@ -9,5 +9,7 @@ public interface ProductImageService {
 	ProductImageResponseDTO createImage(ProductImageDTO image,Long productId);
 	ProductImageResponseDTO getImage(Long id);
 	List<ProductImageResponseDTO> getProductImages(Long productId);
+	 void deleteImage(Long imageId);
+	    ProductImageResponseDTO updateImage(Long imageId, ProductImageDTO dto);
 					
 }

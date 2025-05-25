@@ -32,8 +32,10 @@ public class ProductServiceImpl implements ProductService{
 
 	@Override
 	public ProductDetailResponseDTO getProductById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		 Product product = proRepo.findById(id)
+			        .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+			    return dtoConverter.convertToProductDetailResponseDTO(product);
 	}
 
 	@Override
@@ -45,7 +47,10 @@ public class ProductServiceImpl implements ProductService{
 
 	@Override
 	public void deleteProduct(Long id) {
-		// TODO Auto-generated method stub
+		Product product = proRepo.findById(id)
+		        .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+		    proRepo.delete(product);
 		
 	}
 
@@ -71,5 +76,22 @@ public class ProductServiceImpl implements ProductService{
 		return proRepo.findById(id)
 		        .orElseThrow(() -> new RuntimeException("Product not found with ID: " + id));
 	}
+	@Override
+	public ProductResponseDTO updateProduct(Long id, ProductRequestDto dto) {
+	    Product existingProduct = proRepo.findById(id)
+	        .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+	    // Update fields manually
+	    existingProduct.setName(dto.getName());
+	    existingProduct.setDescription(dto.getDescription());
+	    existingProduct.setPrice(dto.getPrice());
+	    existingProduct.setSku(dto.getSku());
+	    existingProduct.setQuantity(dto.getQuantity());
+	    existingProduct.setCategoryId(dto.getCategoryId());
+
+	    Product updated = proRepo.save(existingProduct);
+	    return dtoConverter.convertToProductResponseDTO(updated);
+	}
+
 
 }

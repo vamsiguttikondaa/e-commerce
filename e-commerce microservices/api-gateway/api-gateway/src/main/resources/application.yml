@@ -1,0 +1,37 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/product/**
+         
+        - id: category-service
+          uri: lb://category-service
+          predicates:
+            - Path=/api/categories/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: DEBUG
+    org.springframework.web.reactive: DEBUG
+    org.springframework.http.server.reactive: DEBUG
+    com.netflix.eureka: DEBUG
+    com.netflix.discovery: DEBUG
